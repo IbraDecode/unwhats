@@ -1,0 +1,59 @@
+name: unwhats
+
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      HOST: 0.0.0.0
+      PORT: "3000"
+      DATABASE_URL: postgres://unwhats:unwhats@postgres:5432/unwhats
+      REDIS_URL: redis://redis:6379
+      API_KEY_DEV: ${API_KEY_DEV:-uw_test_localdevelopmentkey}
+      WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-dev-only-secret-change-me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: unwhats
+      POSTGRES_PASSWORD: unwhats
+      POSTGRES_DB: unwhats
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../postgres/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unwhats -d unwhats"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-data:

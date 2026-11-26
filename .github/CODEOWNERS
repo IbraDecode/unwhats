@@ -1,0 +1,8 @@
+* @IbraDecode
+
+/packages/core/ @IbraDecode
+/packages/contracts/ @IbraDecode
+/packages/provider-sdk/ @IbraDecode
+/packages/openapi/ @IbraDecode
+/apps/api/ @IbraDecode
+/docs/decisions/ @IbraDecode

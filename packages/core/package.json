@@ -1,0 +1,26 @@
+{
+  "name": "@unwhats/core",
+  "version": "0.1.0",
+  "description": "Domain logic UnWhats: ID, status message, capability, dan event",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@unwhats/contracts": "workspace:*",
+    "@unwhats/errors": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test"
+  }
+}

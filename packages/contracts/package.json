@@ -1,0 +1,31 @@
+{
+  "name": "@unwhats/contracts",
+  "version": "0.1.0",
+  "description": "Skema dan kontrak data bersama UnWhats",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@unwhats/errors": "workspace:*"
+  },
+  "devDependencies": {
+    "zod": "^3.24.2"
+  },
+  "peerDependencies": {
+    "zod": "^3.24.2"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test"
+  }
+}

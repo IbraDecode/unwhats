@@ -1,0 +1,7 @@
+{
+  "name": "@unwhats/webhook-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Worker pengiriman webhook (direncanakan M5 — BullMQ)",
+  "license": "Apache-2.0"
+}

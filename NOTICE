@@ -1,0 +1,35 @@
+UnWhats — Messaging Infrastructure, Reimagined.
+Copyright 2026 Ibra Ramdan
+
+This product includes software developed as part of the UnWhats project.
+
+Lisensi kode sumber baru: Apache License 2.0 (lihat LICENSE).
+Dokumentasi: Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+DEPENDENSI PIHAK KETIGA
+
+Paket perangkat lunak yang digunakan dalam repositori ini memiliki lisensi masing-masing.
+Audit lisensi wajib dilakukan sebelum distribusi komersial. Ringkasan awal:
+
+- fastify — MIT
+- zod — MIT
+- typescript — Apache-2.0
+- vitest — MIT
+- turbo — MIT
+- eslint — MIT
+- prettier — MIT
+- @changesets/cli — MIT
+
+PROYEK REFERENSI (RISET, BUKAN KODE YANG DIGABUNGKAN)
+
+- WhiskeySockets/Baileys — MIT
+- tulir/whatsmeow — MPL-2.0
+- WAHA — lihat lisensi repositori resmi
+- Evolution API — Apache-2.0 dengan ketentuan tambahan
+- open-wa — Hippocratic + Do No Harm 1.1
+- whatsapp-web.js / WPPConnect — lihat lisensi repositori resmi
+
+Referensi tersebut dipelajari secara arsitektural. Tidak ada source code
+mereka yang disalin ke dalam repositori ini. Lihat docs/research/.
+
+UnWhats bukan produk resmi WhatsApp dan tidak berafiliasi dengan Meta Platforms, Inc.

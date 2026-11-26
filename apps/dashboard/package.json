@@ -1,0 +1,7 @@
+{
+  "name": "@unwhats/dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dashboard developer UnWhats (direncanakan M7 — Next.js)",
+  "license": "Apache-2.0"
+}

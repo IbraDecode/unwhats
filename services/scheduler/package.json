@@ -1,0 +1,7 @@
+{
+  "name": "@unwhats/scheduler",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Penjadwalan tugas UnWhats (direncanakan M9)",
+  "license": "Apache-2.0"
+}

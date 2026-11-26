@@ -1,0 +1,25 @@
+{
+  "name": "@unwhats/cli",
+  "version": "0.1.0",
+  "description": "CLI developer UnWhats",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": true,
+  "bin": {
+    "unwhats": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@unwhats/errors": "workspace:*",
+    "@unwhats/sdk-js": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3"
+  }
+}

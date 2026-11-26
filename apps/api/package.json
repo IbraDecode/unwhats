@@ -1,0 +1,31 @@
+{
+  "name": "@unwhats/api",
+  "version": "0.1.0",
+  "description": "API Gateway UnWhats (REST v1)",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@unwhats/config": "workspace:*",
+    "@unwhats/contracts": "workspace:*",
+    "@unwhats/core": "workspace:*",
+    "@unwhats/errors": "workspace:*",
+    "@unwhats/event-bus": "workspace:*",
+    "@unwhats/logger": "workspace:*",
+    "@unwhats/provider-sdk": "workspace:*",
+    "@unwhats/webhook": "workspace:*",
+    "fastify": "^5.2.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3"
+  }
+}

@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# Build output
+dist/
+build/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Testing
+coverage/
+.vitest/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Runtime data
+data/
+*.db
+*.sqlite
+*.log
+
+# Editors & OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Generated artifacts
+*.tgz
+*.tar.gz
+CHANGELOG.generated.md
