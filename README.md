@@ -4,7 +4,7 @@
 
 UnWhats adalah ekosistem infrastruktur messaging _developer-first_ dengan API terpadu, arsitektur provider yang ekstensibel, antarmuka automation, dan fondasi produk cloud/enterprise. Proyek independen. Tidak berafiliasi dengan atau didukung oleh Meta atau WhatsApp.
 
-> **Status: fondasi awal (M0–M2).** Repositori ini berisi kontrak domain, provider SDK, API Gateway, dan infrastruktur lokal. Fitur pengiriman pesan produksi **belum** tersedia. Lihat [ROADMAP.md](./ROADMAP.md).
+> **Status: M0–M3 selesai.** Repositori berisi kontrak domain, provider SDK, adapter Meta Cloud API resmi, API Gateway, dan infrastruktur lokal. Konektor unofficial tidak tersedia di jalur produksi. Lihat [ROADMAP.md](./ROADMAP.md).
 
 ## Prinsip
 
@@ -81,6 +81,7 @@ curl -X POST http://localhost:3000/v1/messages \
 | `@unwhats/contracts` | Skema Zod dan tipe domain |
 | `@unwhats/core` | ID ULID, state machine status, capability, event |
 | `@unwhats/provider-sdk` | Interface provider, lifecycle, registry |
+| `@unwhats/provider-meta` | Adapter resmi Meta WhatsApp Cloud API + webhook |
 | `@unwhats/webhook` | HMAC-SHA256, header, retry backoff |
 | `@unwhats/event-bus` | Event bus dan transactional outbox |
 | `@unwhats/config` | Validasi konfigurasi lingkungan |

@@ -5,3 +5,4 @@
 export const DEV_ORGANIZATION_ID = "org_01JXYZ000000000001";
 export const DEV_PROJECT_ID = "prj_01JXYZ000000000002";
 export const SERVICE_NAME = "unwhats-api";
+export const META_WEBHOOK_PATH = "/v1/webhooks/inbound/meta-cloud";

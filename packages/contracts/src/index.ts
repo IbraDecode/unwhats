@@ -64,6 +64,14 @@ export const MediaContentSchema = z.object({
   mime_type: z.string().optional(),
 });
 
+export const InteractiveContentSchema = z.object({
+  type: z.enum(["button", "list", "cta_url"]),
+  body: z.object({ text: z.string() }).optional(),
+  action: z.record(z.string(), z.unknown()),
+  footer: z.object({ text: z.string() }).optional(),
+  header: z.object({ type: z.string(), text: z.string() }).optional(),
+});
+
 export const MetadataSchema = z.record(z.string(), z.unknown());
 
 export const MessageSchema = z.object({
@@ -82,6 +90,7 @@ export const MessageSchema = z.object({
   text: TextContentSchema.nullable(),
   template: TemplateContentSchema.nullable(),
   media: MediaContentSchema.nullable(),
+  interactive: InteractiveContentSchema.nullable(),
   metadata: MetadataSchema,
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
@@ -96,6 +105,7 @@ export const SendMessageInputSchema = z
     text: TextContentSchema.optional(),
     template: TemplateContentSchema.optional(),
     media: MediaContentSchema.optional(),
+    interactive: InteractiveContentSchema.optional(),
     metadata: MetadataSchema.default({}),
   })
   .refine((value) => value.type !== "text" || value.text !== undefined, {

@@ -16,6 +16,13 @@ services:
       REDIS_URL: redis://redis:6379
       API_KEY_DEV: ${API_KEY_DEV:-uw_test_localdevelopmentkey}
       WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-dev-only-secret-change-me}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      META_PHONE_NUMBER_ID: ${META_PHONE_NUMBER_ID:-}
+      META_BUSINESS_ACCOUNT_ID: ${META_BUSINESS_ACCOUNT_ID:-}
+      META_API_VERSION: ${META_API_VERSION:-v23.0}
+      META_BASE_URL: ${META_BASE_URL:-https://graph.facebook.com}
+      META_APP_SECRET: ${META_APP_SECRET:-}
+      META_WEBHOOK_VERIFY_TOKEN: ${META_WEBHOOK_VERIFY_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy

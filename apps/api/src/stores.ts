@@ -16,6 +16,21 @@ export class InMemoryMessageStore {
     return this.byOrganization.get(organizationId)?.find((message) => message.id === id);
   }
 
+  findByProviderMessageId(providerMessageId: string): Message | undefined {
+    for (const list of this.byOrganization.values()) {
+      const found = list.find((message) => message.provider_message_id === providerMessageId);
+      if (found !== undefined) return found;
+    }
+    return undefined;
+  }
+
+  update(message: Message): void {
+    const list = this.byOrganization.get(message.organization_id);
+    if (list === undefined) return;
+    const index = list.findIndex((item) => item.id === message.id);
+    if (index >= 0) list[index] = message;
+  }
+
   list(organizationId: string): Message[] {
     return [...(this.byOrganization.get(organizationId) ?? [])].reverse();
   }

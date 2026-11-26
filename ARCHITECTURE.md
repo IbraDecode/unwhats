@@ -70,7 +70,7 @@ mcp      → sdk-js + contracts + errors (TIDAK mengakses DB)
 | Webhook signature + outbox | ✅ kontrak M5 |
 | PostgreSQL migration penuh | ⏳ M4 |
 | BullMQ worker + DLQ | ⏳ M5 |
-| Meta Cloud API adapter | ⏳ M3 |
+| Meta Cloud API adapter + webhook inbound | ✅ M3 |
 | Dashboard, Cloud, Enterprise | ⏳ M7–M10 |
 
 Lihat detail di [docs/architecture/](./docs/architecture/) dan [TMD](./docs/TECHNICAL-MASTER-DOCUMENT.md).

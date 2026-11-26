@@ -17,6 +17,7 @@ describe("OpenAPI 3.1 spec", () => {
         "/v1/messages/{id}",
         "/v1/providers",
         "/v1/webhooks",
+        "/v1/webhooks/inbound/meta-cloud",
         "/v1/usage",
       ]),
     );

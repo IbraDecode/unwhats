@@ -10,6 +10,7 @@ Hasil riset bersifat referensi arsitektur. **Hasil riset tidak otomatis menjadi 
 | UW-RES-004 | Provider abstraction | Selesai → ADR 0002 |
 | UW-RES-005 | Audit lisensi dependency | Awal → ADR 0006 |
 | UW-RES-006 | Webhook reliability | Selesai → ADR 0005 |
+| UW-RES-007 | Meta WhatsApp Cloud API | Selesai → ADR 0010 |
 
 Template setiap laporan: Research ID, Subject, Repository, Version, License, Architecture, Capabilities, Dependencies, Security, Compatibility, Conclusion, Decision.
 

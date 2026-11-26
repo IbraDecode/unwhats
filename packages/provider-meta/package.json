@@ -1,0 +1,29 @@
+{
+  "name": "@unwhats/provider-meta",
+  "version": "0.1.0",
+  "description": "Adapter resmi Meta WhatsApp Cloud API untuk UnWhats",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@unwhats/contracts": "workspace:*",
+    "@unwhats/core": "workspace:*",
+    "@unwhats/errors": "workspace:*",
+    "@unwhats/provider-sdk": "workspace:*",
+    "zod": "^4.6.7"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test"
+  }
+}

@@ -30,6 +30,7 @@ export function fakeMessage(overrides: Partial<Message> = {}): Message {
     text: { body: "Pesan uji" },
     template: null,
     media: null,
+    interactive: null,
     metadata: {},
     created_at: now,
     updated_at: now,
