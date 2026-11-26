@@ -7,7 +7,7 @@ Urutan milestone, bukan janji tanggal rilis.
 | M0 | Project Foundation | ✅ | Repo, license, governance, ADR, monorepo, tooling |
 | M1 | Core Contracts | ✅ | Domain model, provider interface, capability, error, event |
 | M2 | API Foundation | ✅ | Fastify, OpenAPI, auth, RBAC scope, validasi, idempotensi |
-| M3 | Official Provider | ⏳ | Meta Cloud API adapter, webhook verification, template, status |
+| M3 | Official Provider | ✅ | Meta Cloud API adapter, webhook verification, inbound messages, template, status tracking |
 | M4 | Persistence | ⏳ | Drizzle migration, PostgreSQL RLS, transaksi, outbox nyata |
 | M5 | Event Infrastructure | ⏳ | BullMQ, webhook dispatcher, retry, DLQ, event inspector |
 | M6 | Developer Experience | 🔶 | SDK JS ✅, SDK Go, CLI ✅ dasar, docs site, playground |
@@ -34,7 +34,7 @@ UW-001…UW-018: repository, pnpm workspace, Turborepo, TypeScript, ESLint, Pret
 ## Sprint berikutnya
 
 1. Sprint 1 — Core API lanjutan (organization/project nyata di DB, API key rotation).
-2. Sprint 2 — Meta Cloud API adapter + webhook inbound.
+2. Sprint 2 — Meta Cloud API adapter + webhook inbound ✅ selesai.
 3. Sprint 3 — Reliability (outbox PostgreSQL, worker, DLQ).
 4. Sprint 4 — SDK Go, docs site, playground, contoh integrasi.
 

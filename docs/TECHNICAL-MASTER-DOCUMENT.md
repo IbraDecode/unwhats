@@ -129,6 +129,8 @@ Ringkasan; detail di `docs/decisions/`.
 | 0006 | Open source + private products terpisah |
 | 0007 | Hanya provider resmi untuk produksi |
 | 0008 | snake_case sebagai format field API & domain |
+| 0009 | Transisi status maju saja (provider boleh melompat status) |
+| 0010 | Adapter Meta Cloud API sebagai provider produksi |
 
 ---
 
@@ -211,7 +213,7 @@ Capability: `text`, `media`, `templates`, `interactive`, `inbound_messages`, `de
 
 Error mapping: `AUTHENTICATION_ERROR`, `AUTHORIZATION_ERROR`, `PROVIDER_UNAVAILABLE`, `PROVIDER_TIMEOUT`, `RATE_LIMITED`, `UNSUPPORTED_CAPABILITY`, `INVALID_MESSAGE`, `MEDIA_PROCESSING_FAILED`, `DELIVERY_FAILED`, `WEBHOOK_FAILED`, `RESOURCE_NOT_FOUND`, `IDEMPOTENCY_CONFLICT`, `INTERNAL_ERROR`, `VALIDATION_ERROR`, `CONFIGURATION_ERROR`, `TENANT_ISOLATION_VIOLATION`.
 
-Implementasi awal: `InMemoryProvider` untuk development/testing. Meta adapter: M3.
+Implementasi awal: `InMemoryProvider` untuk development/testing. Adapter produksi: `@unwhats/provider-meta` (M3) untuk Meta WhatsApp Cloud API — text, template, media, interactive, health, webhook verification, inbound messages, dan status tracking. Error Meta dipetakan ke error registry tanpa membocorkan pesan mentah. Lihat ADR 0010 dan UW-RES-007.
 
 ---
 
@@ -293,4 +295,4 @@ Lihat `ROADMAP.md`. Milestone selesai bukan hanya karena kode berjalan: harus lu
 
 ## 16. Status saat ini
 
-M0, M1, M2 selesai pada commit fondasi. M6 dan M8 memiliki dasar (SDK JS, CLI, MCP tool registry).Fitur lainnya mengikuti roadmap.
+M0, M1, M2, dan M3 selesai. M6 dan M8 memiliki dasar (SDK JS, CLI, MCP tool registry). Fitur lainnya mengikuti roadmap.

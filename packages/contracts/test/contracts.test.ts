@@ -23,6 +23,7 @@ const validMessage = {
   text: { body: "Halo" },
   template: null,
   media: null,
+  interactive: null,
   metadata: {},
   created_at: "2026-11-26T00:00:00Z",
   updated_at: "2026-11-26T00:00:00Z",

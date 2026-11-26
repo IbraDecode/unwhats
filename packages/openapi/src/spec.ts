@@ -172,6 +172,45 @@ export const openapiSpec = {
         responses: { "200": { description: "Hasil pengujian", content: { "application/json": { schema: { $ref: "#/components/schemas/Success" } } } } },
       },
     },
+    "/v1/webhooks/inbound/meta-cloud": {
+      get: {
+        tags: ["Webhooks"],
+        summary: "Verifikasi webhook Meta (hub challenge)",
+        security: [],
+        parameters: [
+          { name: "hub.mode", in: "query", required: true, schema: { type: "string" } },
+          { name: "hub.challenge", in: "query", required: true, schema: { type: "string" } },
+          { name: "hub.verify_token", in: "query", required: true, schema: { type: "string" } },
+        ],
+        responses: {
+          "200": { description: "Challenge dikembalikan sebagai text/plain" },
+          "403": { $ref: "#/components/responses/Error" },
+        },
+      },
+      post: {
+        tags: ["Webhooks"],
+        summary: "Ingestion event webhook Meta Cloud API",
+        description:
+          "Memerlukan header X-Hub-Signature-256 yang dihitung dari raw body dengan app secret.",
+        security: [],
+        parameters: [
+          {
+            name: "X-Hub-Signature-256",
+            in: "header",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { type: "object", additionalProperties: true } } },
+        },
+        responses: {
+          "200": { description: "Event diproses", content: { "application/json": { schema: { $ref: "#/components/schemas/Success" } } } },
+          "403": { $ref: "#/components/responses/Error" },
+        },
+      },
+    },
     "/v1/usage": {
       get: {
         tags: ["Usage"],
@@ -252,6 +291,7 @@ export const openapiSpec = {
           text: { type: ["object", "null"], properties: { body: { type: "string" } } },
           template: { type: ["object", "null"] },
           media: { type: ["object", "null"] },
+          interactive: { type: ["object", "null"] },
           metadata: { type: "object", additionalProperties: true },
           created_at: { type: "string", format: "date-time" },
           updated_at: { type: "string", format: "date-time" },
@@ -267,6 +307,7 @@ export const openapiSpec = {
           text: { type: "object", properties: { body: { type: "string", minLength: 1, maxLength: 4096 } } },
           template: { type: "object", properties: { name: { type: "string" }, language: { type: "string" }, components: { type: "array", items: {} } } },
           media: { type: "object" },
+          interactive: { type: "object" },
           metadata: { type: "object", additionalProperties: true },
         },
       },

@@ -63,6 +63,7 @@ export class InMemoryProvider extends BaseProvider {
           text: input.text ?? null,
           template: input.template ?? null,
           media: input.media ?? null,
+          interactive: input.interactive ?? null,
           metadata: input.metadata,
           status: "failed",
         }),

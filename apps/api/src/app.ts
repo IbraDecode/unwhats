@@ -1,23 +1,44 @@
 import { createHash } from "node:crypto";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
-import type { AppConfig } from "@unwhats/config";
+import { isMetaConfigured, type AppConfig } from "@unwhats/config";
 import {
   PaginationQuerySchema,
   SendMessageInputSchema,
   CreateWebhookInputSchema,
   UpdateWebhookInputSchema,
   type AuthenticatedPrincipal,
+  type DomainEvent,
+  type EventType,
   type Message,
 } from "@unwhats/contracts";
-import { createEvent, createId, hasCapability, requiredCapability } from "@unwhats/core";
+import {
+  createEvent,
+  createId,
+  createMessage,
+  hasCapability,
+  requiredCapability,
+  transitionMessage,
+} from "@unwhats/core";
 import { UnWhatsError, toUnWhatsError } from "@unwhats/errors";
 import type { EventBus, OutboxStore } from "@unwhats/event-bus";
 import { createLogger, type Logger } from "@unwhats/logger";
 import type { ProviderRegistry } from "@unwhats/provider-sdk";
+import {
+  META_LEGACY_SIGNATURE_HEADER,
+  META_PROVIDER_ID,
+  META_SIGNATURE_HEADER,
+  MetaCloudProvider,
+  parseMetaConfig,
+  parseMetaWebhook,
+  verifyMetaSignature,
+  verifySubscribeToken,
+  type NormalizedWebhookEvent,
+} from "@unwhats/provider-meta";
 import { buildWebhookHeaders } from "@unwhats/webhook";
 import { z } from "zod";
 import { extractBearer, InMemoryApiKeyStore, requireScope } from "./auth.js";
-import { DEV_ORGANIZATION_ID, DEV_PROJECT_ID, SERVICE_NAME } from "./constants.js";
+import { DEV_ORGANIZATION_ID, DEV_PROJECT_ID, META_WEBHOOK_PATH, SERVICE_NAME } from "./constants.js";
+import { installRawBodyCapture, rawBodyOf } from "./raw-body.js";
 import {
   InMemoryEventStore,
   InMemoryIdempotencyStore,
@@ -40,6 +61,7 @@ export interface AppStores {
   projects: InMemoryProjectStore;
   events: InMemoryEventStore;
   counters: UsageCounters;
+  processedWebhookEvents: Set<string>;
 }
 
 export function createStores(): AppStores {
@@ -50,6 +72,7 @@ export function createStores(): AppStores {
     projects: new InMemoryProjectStore(),
     events: new InMemoryEventStore(),
     counters: new UsageCounters(),
+    processedWebhookEvents: new Set<string>(),
   };
 }
 
@@ -104,6 +127,20 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
     trustProxy: options.config.TRUST_PROXY === "true",
     bodyLimit: 1_048_576,
   });
+  installRawBodyCapture(app);
+
+  if (isMetaConfigured(options.config) && options.providers.get(META_PROVIDER_ID) === undefined) {
+    const metaConfig = parseMetaConfig({
+      access_token: options.config.META_ACCESS_TOKEN,
+      phone_number_id: options.config.META_PHONE_NUMBER_ID,
+      business_account_id: options.config.META_BUSINESS_ACCOUNT_ID,
+      api_version: options.config.META_API_VERSION,
+      base_url: options.config.META_BASE_URL,
+      webhook_verify_token: options.config.META_WEBHOOK_VERIFY_TOKEN,
+      app_secret: options.config.META_APP_SECRET,
+    });
+    options.providers.register(new MetaCloudProvider({ config: metaConfig }));
+  }
 
   for (const provider of options.providers.list()) {
     if (provider.getLifecycle?.() === "registered") {
@@ -131,7 +168,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
     void reply.header("x-request-id", requestId);
 
     const path = new URL(request.url, "http://localhost").pathname;
-    if (path === "/health" || path === "/ready") return;
+    if (path === "/health" || path === "/ready" || path === META_WEBHOOK_PATH) return;
 
     const apiKeyHeader = request.headers["x-api-key"];
     const rawKey =
@@ -162,6 +199,30 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   app.addHook("onClose", async () => {
     await options.eventBus.close();
   });
+
+  function requireMetaProvider(): MetaCloudProvider {
+    const provider = options.providers.get(META_PROVIDER_ID);
+    if (!(provider instanceof MetaCloudProvider)) {
+      throw new UnWhatsError({
+        code: "RESOURCE_NOT_FOUND",
+        message: "Provider Meta Cloud API belum dikonfigurasi",
+        details: { provider_id: META_PROVIDER_ID },
+      });
+    }
+    return provider;
+  }
+
+  async function publishDomainEvent(event: DomainEvent): Promise<void> {
+    options.stores.events.append(event);
+    await options.outbox.append(event);
+    await options.eventBus.publish(event);
+  }
+
+  function webhookDedupeKey(event: NormalizedWebhookEvent): string {
+    return event.kind === "status"
+      ? `status:${event.message_id}:${event.status}`
+      : `message:${event.message_id}`;
+  }
 
   // ----- Health -----
   app.get("/health", async () => ({
@@ -395,6 +456,147 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       event: JSON.parse(payload),
       headers,
     });
+  });
+
+  // ----- Meta webhook ingestion -----
+  app.get(META_WEBHOOK_PATH, async (request, reply) => {
+    const query = request.query as Record<string, string | undefined>;
+    const challenge = verifySubscribeToken({
+      mode: query["hub.mode"],
+      challenge: query["hub.challenge"],
+      token: query["hub.verify_token"],
+      expectedToken: options.config.META_WEBHOOK_VERIFY_TOKEN ?? "",
+    });
+    void reply.type("text/plain");
+    return reply.send(challenge);
+  });
+
+  app.post(META_WEBHOOK_PATH, async (request) => {
+    const signatureHeader =
+      request.headers[META_SIGNATURE_HEADER] ?? request.headers[META_LEGACY_SIGNATURE_HEADER];
+    const raw = rawBodyOf(request);
+    const secret = options.config.META_APP_SECRET ?? "";
+    if (
+      !verifyMetaSignature(
+        raw,
+        typeof signatureHeader === "string" ? signatureHeader : undefined,
+        secret,
+      )
+    ) {
+      throw new UnWhatsError({
+        code: "AUTHORIZATION_ERROR",
+        requestId: rid(request),
+        message: "Signature webhook Meta tidak valid",
+      });
+    }
+
+    const events = parseMetaWebhook(request.body);
+    const requestId = rid(request);
+    let processed = 0;
+    let skipped = 0;
+
+    for (const event of events) {
+      const key = webhookDedupeKey(event);
+      if (options.stores.processedWebhookEvents.has(key)) {
+        skipped += 1;
+        continue;
+      }
+
+      if (event.kind === "message") {
+        const message = createMessage({
+          organization_id: DEV_ORGANIZATION_ID,
+          project_id: DEV_PROJECT_ID,
+          provider_id: META_PROVIDER_ID,
+          direction: "inbound",
+          type: event.type,
+          to: event.to,
+          from: event.from,
+          text: event.body !== undefined ? { body: event.body } : null,
+          metadata: {
+            contact_name: event.contact_name ?? null,
+            meta_timestamp: event.timestamp,
+          },
+          status: "accepted",
+          provider_message_id: event.message_id,
+          provider_message_status: "received",
+        });
+        options.stores.messages.save(message);
+        await publishDomainEvent(
+          createEvent({
+            type: "message.received",
+            organization_id: DEV_ORGANIZATION_ID,
+            correlation_id: requestId,
+            data: {
+              message_id: message.id,
+              provider: META_PROVIDER_ID,
+              from: event.from,
+              to: event.to,
+            },
+          }),
+        );
+        options.stores.processedWebhookEvents.add(key);
+        processed += 1;
+      } else {
+        const existing = options.stores.messages.findByProviderMessageId(event.message_id);
+        if (existing === undefined) {
+          skipped += 1;
+          continue;
+        }
+        try {
+          const updated = transitionMessage(existing, event.status, event.status);
+          options.stores.messages.update(updated);
+          await publishDomainEvent(
+            createEvent({
+              type: `message.${event.status}` as EventType,
+              organization_id: DEV_ORGANIZATION_ID,
+              correlation_id: requestId,
+              data: {
+                message_id: updated.id,
+                provider: META_PROVIDER_ID,
+                status: event.status,
+                provider_message_id: event.message_id,
+              },
+            }),
+          );
+          options.stores.processedWebhookEvents.add(key);
+          processed += 1;
+        } catch {
+          skipped += 1; // transisi mundur atau status duplikat diabaikan
+        }
+      }
+    }
+
+    return envelope(requestId, { received: events.length, processed, skipped });
+  });
+
+  // ----- Templates -----
+  app.get("/v1/templates", async (request) => {
+    const principal = principalOf(request);
+    requireScope(principal, "messages:read");
+    const provider = requireMetaProvider();
+    return envelope(rid(request), await provider.listTemplates());
+  });
+
+  app.post("/v1/templates", async (request, reply) => {
+    const principal = principalOf(request);
+    requireScope(principal, "messages:write");
+    const input = parseOrThrow(
+      z.object({
+        name: z.string().min(1),
+        language: z.string().min(2),
+        components: z.array(z.unknown()).optional(),
+      }),
+      request.body,
+    );
+    const provider = requireMetaProvider();
+    const template = await provider.createTemplate({
+      name: input.name,
+      language: input.language,
+      category: "MARKETING",
+      components: input.components ?? [],
+    });
+    void reply.code(201);
+    return envelope(rid(request), template);
   });
 
   // ----- Usage & Events -----

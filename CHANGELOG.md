@@ -2,6 +2,23 @@
 
 Format berdasarkan [Keep a Changelog](https://keepachangelog.com/) dan [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added — M3 Official Provider
+
+- `@unwhats/provider-meta`: adapter Meta WhatsApp Cloud API (text, template, media, interactive, health).
+- Pemetaan error Meta ke error registry UnWhats tanpa membocorkan pesan error mentah.
+- Webhook Meta: verifikasi `hub.challenge`, HMAC-SHA256 atas raw body, normalisasi pesan masuk dan status.
+- Deduplikasi event webhook dan pelacakan status pesan (`accepted → delivered/read/failed`).
+- Endpoint `GET/POST /v1/webhooks/inbound/meta-cloud` dan `GET/POST /v1/templates`.
+- Konfigurasi Meta melalui environment; provider aktif hanya bila kredensial lengkap.
+- ADR 0009 (transisi status maju saja), ADR 0010, research note UW-RES-007.
+
+### Changed
+
+- State machine status mengizinkan lompatan status maju (Meta dapat mengirim `delivered` langsung setelah `accepted`).
+- Model pesan dan OpenAPI memiliki field `interactive`.
+
 ## [0.1.0] — 2026-11-26
 
 ### Added

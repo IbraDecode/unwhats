@@ -17,9 +17,26 @@ export const MESSAGE_STATUS_TRANSITIONS: Readonly<Record<MessageStatus, readonly
 
 export const TERMINAL_STATUSES: readonly MessageStatus[] = ["read", "failed"];
 
+/**
+ * Provider nyata (termasuk Meta) boleh melompati status perantara:
+ * accepted -> delivered langsung adalah hal yang wajar. Aturannya:
+ * transisi maju diizinkan, transisi mundur dilarang, failed dapat terjadi
+ * dari status non-terminal mana pun.
+ */
+export const STATUS_RANK: Readonly<Record<MessageStatus, number>> = {
+  queued: 0,
+  accepted: 1,
+  sent: 2,
+  delivered: 3,
+  read: 4,
+  failed: 5,
+};
+
 export function canTransition(from: MessageStatus, to: MessageStatus): boolean {
   if (from === to) return true;
-  return MESSAGE_STATUS_TRANSITIONS[from].includes(to);
+  if (from === "failed") return false;
+  if (to === "failed") return true;
+  return STATUS_RANK[to] > STATUS_RANK[from];
 }
 
 export function assertTransition(from: MessageStatus, to: MessageStatus): void {
@@ -73,6 +90,7 @@ export interface CreateMessageInput {
   text?: Message["text"];
   template?: Message["template"];
   media?: Message["media"];
+  interactive?: Message["interactive"];
   metadata?: Message["metadata"];
   status?: MessageStatus;
   provider_message_id?: string | null;
@@ -97,6 +115,7 @@ export function createMessage(input: CreateMessageInput): Message {
     text: input.text ?? null,
     template: input.template ?? null,
     media: input.media ?? null,
+    interactive: input.interactive ?? null,
     metadata: input.metadata ?? {},
     created_at: now,
     updated_at: now,

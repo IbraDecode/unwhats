@@ -20,6 +20,7 @@
     "@unwhats/errors": "workspace:*",
     "@unwhats/event-bus": "workspace:*",
     "@unwhats/logger": "workspace:*",
+    "@unwhats/provider-meta": "workspace:*",
     "@unwhats/provider-sdk": "workspace:*",
     "@unwhats/webhook": "workspace:*",
     "fastify": "^5.2.1",

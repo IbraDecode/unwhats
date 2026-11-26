@@ -47,9 +47,15 @@ describe("status message", () => {
     expect(canTransition("delivered", "read")).toBe(true);
   });
 
+  it("mengizinkan lompatan status maju", () => {
+    expect(canTransition("queued", "sent")).toBe(true);
+    expect(canTransition("accepted", "delivered")).toBe(true);
+    expect(() => transitionMessage(sampleMessage(), "delivered")).not.toThrow();
+  });
+
   it("menolak transisi mundur", () => {
     expect(canTransition("delivered", "sent")).toBe(false);
-    expect(() => transitionMessage(sampleMessage(), "sent")).toThrow();
+    expect(canTransition("read", "delivered")).toBe(false);
   });
 
   it("menolak transisi keluar dari status terminal", () => {
