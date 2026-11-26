@@ -20,6 +20,11 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/) dan [Semantic
 - Docker Compose development (API + PostgreSQL + Redis), Dockerfile multi-stage.
 - ADR 0001–0008, research note UW-RES-001–006, TMD, governance docs, CI workflow.
 
+### Security
+
+- Upgrade Vitest ke 4.1.x dan Zod ke 4.6.x setelah audit menemukan kerentanan pada tinypool, vitest, dan zod. Audit bersih: `No known vulnerabilities found`.
+- CI sekarang menggagalkan build bila audit dependency menemukan kerentanan moderate ke atas.
+
 ### Notes
 
 - Provider bawaan `in-memory` hanya untuk development dan testing.
